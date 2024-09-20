@@ -42,6 +42,13 @@ class Builder
     public static $defaultStringLength = 255;
 
     /**
+     * The default vector dimensions for migrations.
+     *
+     * @var int|null
+     */
+    public static $defaultVectorDimension = 384;
+
+    /**
      * The default relationship morph key type.
      *
      * @var string
@@ -81,7 +88,7 @@ class Builder
      */
     public static function defaultMorphKeyType(string $type)
     {
-        if (! in_array($type, ['int', 'uuid', 'ulid'])) {
+        if (!in_array($type, ['int', 'uuid', 'ulid'])) {
             throw new InvalidArgumentException("Morph key type must be 'int', 'uuid', or 'ulid'.");
         }
 
@@ -142,7 +149,7 @@ class Builder
      */
     public function hasTable($table)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix() . $table;
 
         /** @phpstan-ignore arguments.count (SQLite accepts a withSize argument) */
         foreach ($this->getTables(false) as $value) {
@@ -162,7 +169,7 @@ class Builder
      */
     public function hasView($view)
     {
-        $view = $this->connection->getTablePrefix().$view;
+        $view = $this->connection->getTablePrefix() . $view;
 
         foreach ($this->getViews() as $value) {
             if (strtolower($view) === strtolower($value['name'])) {
@@ -243,7 +250,7 @@ class Builder
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
+            if (!in_array(strtolower($column), $tableColumns)) {
                 return false;
             }
         }
@@ -262,7 +269,7 @@ class Builder
     public function whenTableHasColumn(string $table, string $column, Closure $callback)
     {
         if ($this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
+            $this->table($table, fn(Blueprint $table) => $callback($table));
         }
     }
 
@@ -276,8 +283,8 @@ class Builder
      */
     public function whenTableDoesntHaveColumn(string $table, string $column, Closure $callback)
     {
-        if (! $this->hasColumn($table, $column)) {
-            $this->table($table, fn (Blueprint $table) => $callback($table));
+        if (!$this->hasColumn($table, $column)) {
+            $this->table($table, fn(Blueprint $table) => $callback($table));
         }
     }
 
@@ -321,7 +328,7 @@ class Builder
      */
     public function getColumns($table)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix() . $table;
 
         return $this->connection->getPostProcessor()->processColumns(
             $this->connection->selectFromWriteConnection($this->grammar->compileColumns($table))
@@ -336,7 +343,7 @@ class Builder
      */
     public function getIndexes($table)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix() . $table;
 
         return $this->connection->getPostProcessor()->processIndexes(
             $this->connection->selectFromWriteConnection($this->grammar->compileIndexes($table))
@@ -388,7 +395,7 @@ class Builder
      */
     public function getForeignKeys($table)
     {
-        $table = $this->connection->getTablePrefix().$table;
+        $table = $this->connection->getTablePrefix() . $table;
 
         return $this->connection->getPostProcessor()->processForeignKeys(
             $this->connection->selectFromWriteConnection($this->grammar->compileForeignKeys($table))
@@ -575,8 +582,8 @@ class Builder
     protected function createBlueprint($table, ?Closure $callback = null)
     {
         $prefix = $this->connection->getConfig('prefix_indexes')
-                    ? $this->connection->getConfig('prefix')
-                    : '';
+            ? $this->connection->getConfig('prefix')
+            : '';
 
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback, $prefix);
